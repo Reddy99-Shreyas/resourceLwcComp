@@ -95,22 +95,15 @@
             </lightning-card>
             </div>
         </template>
-        
-                                <!-- ADD MORE HTML-->
-                                <!-- ADD MORE HTML-->
-                    
-            <!-- <lightning-button-group> -->
-                <!--  SAVE BUTTON -->
-            <div class="slds-m-top_small">
-                <lightning-button icon-name="utility:save" variant="success" label="Save" onclick={handleSaveClick}></lightning-button>
-            </div>
-            <!-- ADD MORE BUTTON -->
-            <div class="slds-m-top_small">
+                            
+            <div class="button-container">
+                    <!-- ADD MORE BUTTON -->    
                 <lightning-button icon-name="utility:add" variant="brand" label="Add More" onclick={handleAddMoreClick}></lightning-button>
+                &nbsp;
+                    <!--  SAVE BUTTON -->
+                <lightning-button icon-name="utility:save" variant="success" label="Save" onclick={handleSaveClick}></lightning-button>  
             </div>
-            <!-- </lightning-button-group> -->
-                    
-        
+                     
         </lightning-accordion-section>
     </lightning-accordion>
     </lightning-card>

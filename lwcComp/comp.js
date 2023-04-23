@@ -54,13 +54,17 @@ export default class ResourceLwcComp extends LightningElement {
         });
     }
     /*DELETE BUTTON ON CLICK*/
-    handleDeleteClick(index) {
-        this.getResourceDetailRecord.splice(index,1);
-    }          
+    // handleDeleteClick(index){
+    //     this.getResourceDetailRecord.splice(index,1);
+    // }
+    handleDeleteClick(event){
+        if(this.getResourceDetailRecord.length>=1){
+            this.getResourceDetailRecord.splice(event.target.accessKey,1);
+            this.resIndex-1;
+        }  
+    }
 
         //logic on objects 
-    resourceId; // property of resourceId after insertion
-
     @track getResourceRecord = {
         Resource_Name__c: '',
         Total_IT_Experience__c : '',
@@ -86,7 +90,7 @@ export default class ResourceLwcComp extends LightningElement {
         }
     ];
     
-                            /* getting of objects */
+                            /* GETTING OF OBJECTS */
     //for Resource Object Wire and common for all
     @wire(getObjectInfo, {objectApiName: RESOURCE_OBJECT})
     resObj;
@@ -126,7 +130,7 @@ export default class ResourceLwcComp extends LightningElement {
     @wire(getPicklistValues,{recordTypeId: '$resDetailObj.data.defaultRecordTypeId',fieldApiName: RD_WORKED_SKILL_SET}) 
     rdWorkedSkillSetValues;
 
-        /*RESOURCE DETAIL ON CHANGE NEW*/
+                            /*RESOURCE DETAIL ON CHANGE NEW*/
     rdChangeHandler(event) {
         console.log('Access key2:' + event.target.accessKey);
         console.log('id:' + event.target.id);
@@ -149,6 +153,7 @@ export default class ResourceLwcComp extends LightningElement {
             this.getResourceDetailRecord[event.target.accessKey].Worked_skill_set__c = event.detail.value;
         }
     }
+
                         /* HANDLE ONCHANGE FOR RESOURCE DETAIL OBJECT */
     // //Availability in onChange
     // handleRdAvailabilityInChange(event){
@@ -162,7 +167,6 @@ export default class ResourceLwcComp extends LightningElement {
     // handleRdLocationChange(event){
     //     this.getResourceDetailRecord.Location__c = event.detail.value;
     // }
-
     //                     /* INPUT FIELDS ONCHANGE IN RESOURCE DETAIL OBJECT*/
     // // start date onChange
     // handleStartDateChange(event){
@@ -215,39 +219,48 @@ export default class ResourceLwcComp extends LightningElement {
     }
 
                         /*SAVE BUTTON ONCLICK*/
+    resourceId; // property of resourceId after insertion
     handleSaveClick(){
         insertRecord({resourceData: this.getResourceRecord})
         .then((result)=>{
-            console.log(result);
+            console.log('1st inside: '+result);
             this.resourceId = result.Id;
             console.log('before insert details'+ this.getResourceDetailRecord);
             console.log('before insert details'+ this.resourceId);
             insertResourceDetail({rdDataList: this.getResourceDetailRecord, resDetId: this.resourceId})
-            console.log('after insert details');
-            this.getResourceDetailRecord={
-                Total_IT_Experience__c : '',
-                Relavent_Experience__c: '',
-                Availability_status__c: '',
-                Highest_Education__c: '',
-                Location__c: '',
-                Looking_for__c: '',
-                Availability_in__c: '',
-                Relavent_skill_set__c: ''
-            };
-            this.getResourceRecord=[{
-                Resource_Name__c: '',
-                Availability_in__c : '',
-                End_date__c: '',
-                Location__c: '',
-                Project__c: '',
-                Name: '',
-                Served_company__c: '',
-                Start_date__c: '',
-                Worked_skill_set__c: ''
-            }];
+            .then(result=>{
+                console.log('2nd Inside: '+ result);
+                this.getResourceDetailRecord.forEach(function(item){
+                    item.Availability_in__c = '',
+                    item.End_date__c= '',
+                    item.Location__c= '',
+                    item.Project__c= '',
+                    item.Name= '',
+                    item.Served_company__c= '',
+                    item.Start_date__c= '',
+                    item.Worked_skill_set__c= ''
+                });
+                const evt = new ShowToastEvent({
+                    title:'Resource Details are also Saved',
+                    message:'Resource Details are also Saved Successfully',
+                    variant:'success',
+                });
+                this.dispatchEvent(evt);
+            })
+            .catch(error=>{
+                console.error(error);
+                const evt = new ShowToastEvent({
+                    title:'Resource Not Saved',
+                    message: error.body.message,
+                    variant:'error',
+                });
+                this.dispatchEvent(evt);
+            });
+            console.log('after insert  resource details: '+ this.getResourceDetailRecord);
+            this.getResourceRecord={};
             const evt = new ShowToastEvent({
                 title:'Resource Saved',
-                message:'Resource and Resource Details Saved Successfully',
+                message:'Resources Saved Successfully',
                 variant:'success',
             });
             this.dispatchEvent(evt);
